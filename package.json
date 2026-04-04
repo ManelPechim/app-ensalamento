@@ -1,7 +1,9 @@
 {
-  "type":"module",
+  "name": "app-ensalamento",
+  "type": "module",
   "scripts": {
-    "dev": "nodemon backend/server.js"
+    "dev": "nodemon backend/server.js",
+    "dev ts": "nodemon backend/server.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.97.0",
@@ -10,6 +12,10 @@
     "postgres": "^3.4.8"
   },
   "devDependencies": {
-    "nodemon": "^3.1.14"
+    "@types/express": "^5.0.6",
+    "eslint": "^10.0.3",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
   }
 }

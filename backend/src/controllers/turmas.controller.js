@@ -1,27 +1,21 @@
-import supabase from '../config/supabase.js'
+import * as turmasService from '../services/turmas.service.js';
 
 export const getTurmas = async (req, res) => {
-    const { data, error } = await supabase
-    .from('turmas')
-    .select('*');
-
-    if(error){
-        return res.status(500).json({ error: error.message });
-    }; 
-        
-    return res.status(200).json({ turmas: data }); 
+  try {
+    const data = await turmasService.getAllTurmas();
+    return res.status(200).json( data );
+    
+  } catch (err) {
+    return res.status(404).json( err );
+  } 
 };
 
 export const createTurmas = async (req, res) => {
-    const { nome, qtd_alunos, curso } = req.body;
+  try {
+    const data = await turmasService.registerTurmas(req.body);
+    return res.status(200).json({message: 'Turma inserida com sucesso', data});
 
-    const { data, error } = await supabase
-    .from('turmas')
-    .insert([{ nome, qtd_alunos, curso }]);
-        
-    if(error){
-        return res.status(500).json({ error: error.message });
-    }; 
-        
-    return res.status(201).json({ message: 'Turma inserida com sucesso', data}); 
-}
+  } catch (err) {
+    return res.status(404).json({ err: err.message });
+  };
+};

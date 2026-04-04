@@ -3,7 +3,7 @@ import { getTurmas, createTurmas } from '../controllers/turmas.controller.js';
 
 const router = Router();
 
-router.get('/turmas', getTurmas);
-router.post('/turmas', createTurmas);
+router.get('js/', getTurmas);
+router.post('js/', createTurmas);
 
 export default router;
