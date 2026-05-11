@@ -1,0 +1,25 @@
+{
+  "name": "app-ensalamento-backend",
+  "type": "module",
+  "scripts": {
+    "dev": "nodemon --ext ts --exec \"tsx --env-file=.env.local server.ts\"",
+    "build": "tsc -p tsconfig.json",
+    "start": "node ./dist/backend/server.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.97.0",
+    "@types/cors": "^2.8.19",
+    "@types/helmet": "^0.0.48",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "helmet": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.6",
+    "eslint": "^10.0.3",
+    "nodemon": "^3.1.14",
+    "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
+  }
+}
