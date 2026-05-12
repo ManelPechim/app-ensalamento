@@ -1,9 +1,13 @@
 import { Router } from "express";
-import { getSalas, createSalas } from "../controllers/salas.controller.ts";
+import * as SalaController from "../controllers/salas.controller.ts";
 
 const router = Router();
 
-router.get('/', getSalas);
-router.post('/', createSalas);
-
+router.route('/')
+  .get(SalaController.getSalas)
+  .post(SalaController.createSalas)
+;
+router.route('/:id')
+  .delete(SalaController.deleteSalaById)
+;
 export default router;

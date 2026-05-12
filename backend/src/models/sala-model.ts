@@ -2,5 +2,5 @@
 		id_salas: number;
 		nome: string;
 		capacidade: string;
-		turma_id: number;
+		turma_id?: number;
 	};

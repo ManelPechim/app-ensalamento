@@ -17,8 +17,8 @@ export const handleGetAllTurmas = async () => {
   return turmas;
 };
 
-export const handlePostTurmas = async (turmasData: TurmaModel) => {
-  const { nome, curso, qtd_alunos } = turmasData;
+export const handlePostTurmas = async (turmaBody: TurmaModel) => {
+  const { nome, curso, qtd_alunos } = turmaBody;
   // Validação básica
   if (!nome || !curso || !qtd_alunos) {
     throw new AppError('Nome, curso e quantidade de alunos são obrigatórios', Status.BadRequest); // 400
@@ -30,46 +30,40 @@ export const handlePostTurmas = async (turmasData: TurmaModel) => {
     .select('nome')
     .eq('nome', nome);
 
-  if (err) {
-    throw new AppError(
-      'Algo deu errado ao verificar duplicidade da turma',
-      Status.InternalServerError, // 500
-      err.message
-    );
-  }
-  
-  
+  if (err) throw new AppError('Algo deu errado ao verificar duplicidade da turma', Status.InternalServerError, err.message); // 500 
+
   if (turmaComMesmoNome && turmaComMesmoNome.length > 0) {
-    const nomeInput = turmaComMesmoNome.find(turma => turma.nome === turmasData.nome) 
-    throw new AppError(`Já existe uma turma com este nome: ${nomeInput?.nome}`, Status.Conflict); // 409
+    throw new AppError(`Já existe uma turma com este nome: ${turmaBody.nome}`, Status.Conflict); // 409
   };
 
   // Inserir a turma
-  const { data, error } = await supabase
+  const { data: newTurma, error } = await supabase
     .from('turmas')
     .insert({ nome, curso, qtd_alunos })
     .select();
 
-  if (error) {
-    throw new AppError(
-      'Algo deu errado ao inserir a turma',
-      Status.InternalServerError, // 500
-      error.message
-    );
-  }
+  if (error) throw new AppError('Algo deu errado ao inserir a turma', Status.InternalServerError, error.message); // 500
 
-  return data;
+  return newTurma;
 }
 
 export const handleDeleteTurmaById = async (id: number | string) => {
-  const { data: turmaId } = await supabase
+  const { data: turmaId, error: err } = await supabase
     .from('turmas')
     .select('id_turma')
     .eq('id_turma', id)
     .single()
-  
+
   if (!turmaId) {
-    throw new AppError(`O id informado (${id}) para deleção é inválido ou não existe`, Status.NotFound); // 404
+    throw new AppError(`O id informado (${id}) da Turma para deleção é inválido ou não existe`, Status.NotFound); // 404
+  };
+
+  if (err) {
+    throw new AppError(
+      `Algo deu errado na busca do id ${id} da Turma:
+      ${err}`,
+      Status.InternalServerError,
+    );
   };
 
   const { data: deletedTurma, error } = await supabase
@@ -87,5 +81,4 @@ export const handleDeleteTurmaById = async (id: number | string) => {
   };
 
   return deletedTurma;
-  
 };
