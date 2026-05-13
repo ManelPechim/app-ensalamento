@@ -9,7 +9,7 @@ export const getTurmas = asyncErrorHandler(async (_req: Request, res: Response) 
 });
 
 export const createTurma = asyncErrorHandler(async (req: Request, res: Response) => {
-  const newTurma = await TurmasService.handlePostTurmas(req.body);
+  const newTurma = await TurmasService.handlePostTurma(req.body);
   return res.status(Status.Created).json({ message: 'Turma inserida com sucesso', newTurma });
 });
 
@@ -20,9 +20,11 @@ export const deleteTurmaById = asyncErrorHandler(async (req: Request, res: Respo
   return res.status(Status.OK).json({ message: `Turma do id ${id} deletada com sucesso`, deletedTurma })
 });
 
-// TODO
 export const updateTurma = asyncErrorHandler(async (req: Request, res: Response) => {
+  const id = Number(req.params.id);
+  const updateTurma = await TurmasService.handleEditTurma(id, req.body);
 
+  return res.status(Status.OK).json({ message: `Turma do id ${id} editada com sucesso`, updateTurma })
 });
 
 // TODO

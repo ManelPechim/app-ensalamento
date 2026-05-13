@@ -8,6 +8,7 @@ router.route('/')
   .post(TurmaController.createTurma)
 ;
 router.route('/:id')
+  .put(TurmaController.updateTurma)
   .delete(TurmaController.deleteTurmaById)
 ;
 

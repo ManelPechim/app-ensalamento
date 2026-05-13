@@ -1,6 +1,6 @@
 export type TurmaModel = {
 		id_turma: number;
-		qtd_alunos: number;
-		curso: string;
 		nome: string;
+		curso: string;
+		qtd_alunos: number;		
 	};
