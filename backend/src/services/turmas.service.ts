@@ -4,6 +4,8 @@ import { getTurmaIdRepository } from "../repositories/turmas.repository.ts";
 import { AppError } from "../utils/app-error.ts";
 import { Status } from "../utils/http-status-code.ts";
 
+// TODO: Reaproveitar código repetido de querys do Suapbase, abstraindo-as no caminho repository/turmas.repository.ts
+
 export const handleGetAllTurmas = async () => {
   const { data: allTurmas, error } = await supabase
     .from('turmas')

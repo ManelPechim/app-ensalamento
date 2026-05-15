@@ -3,7 +3,7 @@ import * as TurmasService from '../services/turmas.service.ts';
 import { asyncErrorHandler } from '../middlewares/async-handler.ts';
 import { Status } from '../utils/http-status-code.ts';
 
-export const getTurmas = asyncErrorHandler(async (_req: Request, res: Response) => {
+export const getAllTurmas = asyncErrorHandler(async (_req: Request, res: Response) => {
   const turmas = await TurmasService.handleGetAllTurmas();
   return res.status(Status.OK).json({ turmas });
 });
