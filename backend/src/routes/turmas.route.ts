@@ -1,15 +1,17 @@
 import { Router } from 'express';
-import * as TurmaController from '../controllers/turmas.controller.ts';
+import { createTurma, getTurmas, getTurmaById, updateTurma, patchUpdateTurma, deleteTurmaById } from '../controllers/turmas.controller.ts';
 
 const router = Router();
 
 router.route('/')
-  .get(TurmaController.getTurmas)
-  .post(TurmaController.createTurma)
+  .get(getTurmas)
+  .post(createTurma)
 ;
 router.route('/:id')
-  .put(TurmaController.updateTurma)
-  .delete(TurmaController.deleteTurmaById)
+  .get(getTurmaById)
+  .put(updateTurma)
+  .patch(patchUpdateTurma)
+  .delete(deleteTurmaById)
 ;
 
 export default router;
