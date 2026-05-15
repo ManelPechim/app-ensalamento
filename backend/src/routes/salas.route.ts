@@ -1,13 +1,15 @@
 import { Router } from "express";
-import * as SalaController from "../controllers/salas.controller.ts";
+import * as SalasController from "../controllers/salas.controller.ts";
 
 const router = Router();
 
 router.route('/')
-  .get(SalaController.getSalas)
-  .post(SalaController.createSalas)
+  .get(SalasController.getAllSalas)
+  .post(SalasController.createSalas)
 ;
 router.route('/:id')
-  .delete(SalaController.deleteSalaById)
+  .put(SalasController.updateSala)
+  .patch(SalasController.patchUpdateSala)
+  .delete(SalasController.deleteSalaById)
 ;
 export default router;

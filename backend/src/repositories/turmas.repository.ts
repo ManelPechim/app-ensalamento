@@ -1,6 +1,6 @@
 import { supabase } from "../config/supabase.ts";
 
-export const getTurmaIdRepository = async (id: number | string) => {
+export const searchTurmaIdRepository = async (id: number) => {
   const { data: turmaId } = await supabase
     .from('turmas')
     .select('id_turma')
