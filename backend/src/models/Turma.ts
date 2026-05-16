@@ -1,6 +1,5 @@
-export type TurmaModel = {
-		id_turma: number;
-		nome: string;
-		curso: string;
-		qtd_alunos: number;		
-	};
+import { Tables, TablesInsert, TablesUpdate } from "../config/database/schema.ts";
+
+export type TurmaModel = Tables<'turmas'>;
+export type TurmaInsert = TablesInsert<'turmas'>;
+export type TurmaUpdate = TablesUpdate<'turmas'>;

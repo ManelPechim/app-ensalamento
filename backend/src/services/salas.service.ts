@@ -1,13 +1,16 @@
-import { supabase } from "../config/supabase.ts";
-import { SalaModel } from "../models/Sala.ts";
+import { supabase } from "../config/database/supabase.ts";
+import { SalaModel, SalaUpdate } from "../models/Sala.ts";
 import { searchSalaIdRepository } from "../repositories/salas.repository.ts";
 import { AppError } from "../utils/app-error.ts";
 import { Status } from "../utils/http-status-code.ts";
 
+// TODO: Reaproveitar código repetido de querys do Suapbase, abstraindo-as no caminho repository/salas.repository.ts
+
 export const handleGetAllSalas = async () => {
   const { data: salas, error } = await supabase
     .from('salas')
-    .select('*, turmas:turma_id (*)'); // faz um JOIN automático e retorna os dados da turma dentro de cada sala
+    .select('*, turmas:turma_id (*)') // faz um JOIN automático e retorna os dados da turma dentro de cada sala
+    .order('id_sala');
 
   if (error) throw new AppError('Algo deu errado na listagem das salas', Status.InternalServerError, error.message); // 500
 
@@ -26,7 +29,7 @@ export const handlePostSala = async (salaBody: SalaModel) => {
     supabase
       .from('turmas')
       .select('qtd_alunos')
-      .eq('id_turma', turma_id)
+      .eq('id_turma', turma_id!)
       .single(),
     supabase
       .from('salas')
@@ -35,7 +38,7 @@ export const handlePostSala = async (salaBody: SalaModel) => {
     supabase
       .from('salas')
       .select('id_sala')
-      .eq('turma_id', turma_id)
+      .eq('turma_id', turma_id!)
   ]);
 
   if (turmaError && turma_id) throw new AppError('Turma não encontrada', Status.NotFound, turmaError.message); // 404
@@ -103,19 +106,14 @@ export const handleEditSala = async (id: number, salaBody: SalaModel) => {
   return updatedSala;
 };
 
-export const handlePatchSala = async (id: number, salaBody: SalaModel) => {
+export const handlePatchSala = async (id: number, salaBody: Partial<SalaModel>) => {
   const salaId = await searchSalaIdRepository(id);
   if (!salaId) throw new AppError(`O id informado (${id}) da Sala para edição é inválido ou não existe`, Status.NotFound); // 404
 
   const { nome, capacidade, turma_id } = salaBody
+  if (!nome && !capacidade && !turma_id) throw new AppError('Nenhum campo válido foi informado para alteração da Sala', Status.BadRequest); // 400
 
-  // Monta só os campos que vieram de fato no body
-  const fieldsToUpdate = Object.fromEntries(
-    Object.entries({ nome, capacidade, turma_id }).filter(([_, value]) => value !== undefined)
-  );
-  if (Object.keys(fieldsToUpdate).length === 0) throw new AppError('Nenhum campo válido foi informado para alteração da Sala', Status.BadRequest); // 400
-
-  const { data } = await supabase
+  const { data: salaTurmaId } = await supabase
     .from('salas')
     .select('turma_id')
     .eq('id_sala', id)
@@ -129,17 +127,17 @@ export const handlePatchSala = async (id: number, salaBody: SalaModel) => {
     supabase
       .from('turmas')
       .select('qtd_alunos')
-      .eq('id_turma', data?.turma_id)
+      .eq('id_turma', salaTurmaId?.turma_id!)
       .single(),
     supabase
       .from('salas')
       .select('nome, id_sala')
-      .eq('nome', nome)
+      .eq('nome', nome!)
       .neq('id_sala', id),
     supabase
       .from('salas')
       .select('id_sala')
-      .eq('turma_id', turma_id)
+      .eq('turma_id', turma_id!)
       .neq('id_sala', id),
   ]);
 
@@ -149,11 +147,11 @@ export const handlePatchSala = async (id: number, salaBody: SalaModel) => {
 
   if (salaComMesmoNome && salaComMesmoNome.length > 0) throw new AppError(`Já existe uma Sala com este nome: ${salaBody.nome}`, Status.Conflict); // 409
   if (salasComTurmaAlocada && salasComTurmaAlocada.length > 0) throw new AppError('Essa Turma já está alocada em outra Sala', Status.Conflict); // 409
-  if (turma && turma.qtd_alunos > capacidade) throw new AppError('Quantidade de alunos excede a capacidade da Sala', Status.BadRequest); // 400
+  if (turma && turma.qtd_alunos > capacidade!) throw new AppError('Quantidade de alunos excede a capacidade da Sala', Status.BadRequest); // 400
 
   const { data: patchedSala, error } = await supabase
     .from('salas')
-    .update(fieldsToUpdate)
+    .update({ nome, capacidade, turma_id })
     .eq('id_sala', id)
     .select('*, turmas:turma_id (*)');
   if (error) throw new AppError(`Algo deu errado na edição da Sala do id ${id}: ${error.message}`, Status.InternalServerError); // 500
@@ -161,13 +159,8 @@ export const handlePatchSala = async (id: number, salaBody: SalaModel) => {
   return patchedSala;
 };
 
-export const handleDeleteSalaById = async (id: number | string) => {
-  const { data: salaId } = await supabase
-    .from('salas')
-    .select('id_sala')
-    .eq('id_sala', id)
-    .single();
-
+export const handleDeleteSalaById = async (id: number) => {
+  const salaId = await searchSalaIdRepository(id);
   if (!salaId) throw new AppError(`O id informado (${id}) da Sala para deleção é inválido ou não existe`, Status.NotFound); // 404
 
   const { data: deletedSala, error } = await supabase

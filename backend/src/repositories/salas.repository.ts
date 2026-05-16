@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabase.ts";
+import { supabase } from "../config/database/supabase.ts";
 
 export const searchSalaIdRepository = async (id: number) => {
   const { data: salaId } = await supabase
