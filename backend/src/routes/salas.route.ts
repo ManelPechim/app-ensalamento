@@ -8,6 +8,7 @@ router.route('/')
   .post(SalasController.createSalas)
 ;
 router.route('/:id')
+  .get(SalasController.getSalaById)
   .put(SalasController.updateSala)
   .patch(SalasController.patchUpdateSala)
   .delete(SalasController.deleteSalaById)
