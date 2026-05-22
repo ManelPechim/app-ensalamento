@@ -4,8 +4,6 @@ import * as Repository from "../repositories/salas.repository.ts";
 import { AppError } from "../utils/app-error.ts";
 import { Status } from "../utils/http-status-code.ts";
 
-// TODO: Reaproveitar código repetido de querys do Suapbase, abstraindo-as no caminho repository/salas.repository.ts
-
 export const handleGetAllSalas = async () => {
   const { data: allSalas, error } = await supabase
     .from('salas')
@@ -16,7 +14,7 @@ export const handleGetAllSalas = async () => {
   return allSalas;
 };
 
-export const handleGetSalaById = async (id: number) => {
+export const handleGetSalaById = async (id: SalaModel['id_sala']) => {
   const { salaId } = await Repository.searchSalaIdRepository(id);
   if (!salaId) throw new AppError(`O id informado (${id}) da Sala é inválido ou não existe`, Status.NotFound); // 404
 
@@ -44,7 +42,7 @@ export const handlePostSala = async (salaBody: SalaModel) => {
   return newSala;
 };
 
-export const handleEditSala = async (id: number, salaBody: SalaModel) => {
+export const handleEditSala = async (id: SalaModel['id_sala'], salaBody: SalaModel) => {
   const { salaId } = await Repository.searchSalaIdRepository(id);
   if (!salaId) throw new AppError(`O id informado (${id}) da Sala para edição é inválido ou não existe`, Status.NotFound); // 404
 
@@ -63,7 +61,7 @@ export const handleEditSala = async (id: number, salaBody: SalaModel) => {
   return updatedSala;
 };
 
-export const handlePatchSala = async (id: number, salaBody: SalaModel) => {
+export const handlePatchSala = async (id: SalaModel['id_sala'], salaBody: SalaModel) => {
   const { salaId } = await Repository.searchSalaIdRepository(id);
   if (!salaId) throw new AppError(`O id informado (${id}) da Sala para edição é inválido ou não existe`, Status.NotFound); // 404
 
@@ -88,7 +86,7 @@ export const handlePatchSala = async (id: number, salaBody: SalaModel) => {
   return patchedSala;
 };
 
-export const handleDeleteSalaById = async (id: number) => {
+export const handleDeleteSalaById = async (id: SalaModel['id_sala']) => {
   const { salaId } = await Repository.searchSalaIdRepository(id);
   if (!salaId) throw new AppError(`O id informado (${id}) da Sala para deleção é inválido ou não existe`, Status.NotFound); // 404
 

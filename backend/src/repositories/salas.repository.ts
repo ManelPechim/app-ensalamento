@@ -3,7 +3,7 @@ import { SalaModel } from "../models/Sala.ts";
 import { AppError } from "../utils/app-error.ts";
 import { Status } from "../utils/http-status-code.ts";
 
-export const searchSalaIdRepository = async (id: number) => {
+export const searchSalaIdRepository = async (id: SalaModel['id_sala']) => {
   const { data: salaId } = await supabase
     .from('salas')
     .select('id_sala')
