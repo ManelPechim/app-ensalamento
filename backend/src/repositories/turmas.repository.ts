@@ -3,7 +3,7 @@ import { TurmaModel } from "../models/Turma.ts";
 import { AppError } from "../utils/app-error.ts";
 import { Status } from "../utils/http-status-code.ts";
 
-export const searchTurmaIdRepository = async (idTurma: TurmaModel['id_turma']) => {
+export const searchTurmaId = async (idTurma: TurmaModel['id_turma']) => {
   const { data: turmaId } = await supabase
     .from('turmas')
     .select('id_turma')
@@ -13,8 +13,7 @@ export const searchTurmaIdRepository = async (idTurma: TurmaModel['id_turma']) =
   return { turmaId };
 };
 
-export const turmaComMesmoNomeRepository = async (nome: TurmaModel['nome'], idTurma?: TurmaModel['id_turma']) => {
-
+export const turmaComMesmoNome = async (nome: TurmaModel['nome'], idTurma?: TurmaModel['id_turma']) => {
   const searchMesmoNome = supabase // Busca no banco um nome que seja igual ao nome inserido no body
     .from('turmas')
     .select('nome')
@@ -26,5 +25,16 @@ export const turmaComMesmoNomeRepository = async (nome: TurmaModel['nome'], idTu
   if (err) throw new AppError('Algo deu errado ao verificar duplicidade do nome da Turma', Status.InternalServerError, err.message); // 500 
   if (turmaComMesmoNome && turmaComMesmoNome.length > 0) throw new AppError(`Já existe uma Turma com este nome: ${nome}`, Status.Conflict); // 409
   // Verifica duplacidade de nome de turma
+  return;
+};
+
+export const salaCapacidadeMaiorTurmaQtdAlunos = async (idTurma: TurmaModel['id_turma'], qtdAlunos: TurmaModel['qtd_alunos']) => {
+  const { data: sala, error: salaError } = await supabase
+    .from('salas')
+    .select('capacidade')
+    .eq('turma_id', idTurma)
+    .single();
+  if (salaError) throw new AppError(`Algo deu errado ao verificar a capacidade da Sala, ${salaError}`, Status.InternalServerError);
+  if (sala && sala.capacidade < qtdAlunos) throw new AppError('A Turma já alocada em uma Sala não pode ter sua quantidade de alunos menor que a capacidade da Sala', Status.BadRequest);
   return;
 };

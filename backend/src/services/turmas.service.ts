@@ -4,9 +4,6 @@ import * as Repository from "../repositories/turmas.repository.ts";
 import { AppError } from "../utils/app-error.ts";
 import { Status } from "../utils/http-status-code.ts";
 
-// TODO: Se a Turma já estiver alocada em uma sala e sua respsectiva quantidade de alunos for editada para uma quantidade
-// maior que a capacidade da Sala, impedir tal e retornar um erro.
-
 export const handleGetAllTurmas = async () => {
   const { data: allTurmas, error } = await supabase
     .from('turmas')
@@ -18,7 +15,7 @@ export const handleGetAllTurmas = async () => {
 };
 
 export const handleGetTurmaById = async (id: TurmaModel['id_turma']) => {
-  const { turmaId } = await Repository.searchTurmaIdRepository(id);
+  const { turmaId } = await Repository.searchTurmaId(id);
   if (!turmaId) throw new AppError(`O id da Turma (${id}) informado é inválido ou não existe`, Status.NotFound); // 404
 
   const { data: turma, error } = await supabase
@@ -34,7 +31,7 @@ export const handlePostTurma = async (turmaBody: TurmaModel) => {
   const { nome, curso, qtd_alunos } = turmaBody; // Validação básica
   if (!nome || !curso || !qtd_alunos) throw new AppError('Nome, curso e quantidade de alunos são campos obrigatórios', Status.BadRequest); // 400
 
-  await Repository.turmaComMesmoNomeRepository(nome);
+  await Repository.turmaComMesmoNome(nome);
 
   const { data: newTurma, error } = await supabase // Inserir a turma
     .from('turmas')
@@ -46,13 +43,14 @@ export const handlePostTurma = async (turmaBody: TurmaModel) => {
 };
 
 export const handleEditTurma = async (id: TurmaModel['id_turma'], turmaBody: TurmaModel) => {
-  const { turmaId } = await Repository.searchTurmaIdRepository(id);
+  const { turmaId } = await Repository.searchTurmaId(id);
   if (!turmaId) throw new AppError(`O id da Turma (${id}) informado para edição é inválido ou não existe`, Status.NotFound); // 404
 
   const { nome, curso, qtd_alunos } = turmaBody;
   if (!nome || !curso || !qtd_alunos) throw new AppError('Nome, curso e quantidade de alunos da Turma são campos obrigatórios', Status.BadRequest); // 400
 
-  await Repository.turmaComMesmoNomeRepository(nome, id);
+  await Repository.turmaComMesmoNome(nome, id);
+  await Repository.salaCapacidadeMaiorTurmaQtdAlunos(id, qtd_alunos);
 
   const { data: updatedTurma, error } = await supabase
     .from('turmas')
@@ -65,13 +63,14 @@ export const handleEditTurma = async (id: TurmaModel['id_turma'], turmaBody: Tur
 };
 
 export const handlePatchTurma = async (id: TurmaModel['id_turma'], turmaBody: TurmaModel) => {
-  const { turmaId } = await Repository.searchTurmaIdRepository(id);
+  const { turmaId } = await Repository.searchTurmaId(id);
   if (!turmaId) throw new AppError(`O id da Turma (${id}) informado para alteração é inválido ou não existe`, Status.NotFound); // 404
 
   const { nome, curso, qtd_alunos } = turmaBody;
   if (!nome && !curso && !qtd_alunos) throw new AppError('Nenhum campo válido foi informado para alteração da Turma', Status.BadRequest); // 400
 
-  await Repository.turmaComMesmoNomeRepository(nome, id);
+  await Repository.turmaComMesmoNome(nome, id);
+  await Repository.salaCapacidadeMaiorTurmaQtdAlunos(id, qtd_alunos);
 
   const { data: patchedTurma, error } = await supabase
     .from('turmas')
@@ -84,7 +83,7 @@ export const handlePatchTurma = async (id: TurmaModel['id_turma'], turmaBody: Tu
 };
 
 export const handleDeleteTurmaById = async (id: TurmaModel['id_turma']) => {
-  const { turmaId } = await Repository.searchTurmaIdRepository(id);
+  const { turmaId } = await Repository.searchTurmaId(id);
   if (!turmaId) throw new AppError(`O id da Turma (${id}) informado para deleção é inválido ou não existe`, Status.NotFound); // 404
 
   const { data: deletedTurma, error } = await supabase
