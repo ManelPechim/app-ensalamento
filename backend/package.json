@@ -1,5 +1,6 @@
 {
   "name": "app-ensalamento-backend",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "nodemon --ext ts --exec \"tsx --env-file=.env.local server.ts\"",

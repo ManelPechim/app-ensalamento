@@ -34,7 +34,7 @@ export const salaCapacidadeMaiorTurmaQtdAlunos = async (idTurma: TurmaModel['id_
     .select('capacidade')
     .eq('turma_id', idTurma)
     .single();
-  if (salaError) throw new AppError(`Algo deu errado ao verificar a capacidade da Sala, ${salaError}`, Status.InternalServerError);
-  if (sala && sala.capacidade < qtdAlunos) throw new AppError('A Turma já alocada em uma Sala não pode ter sua quantidade de alunos menor que a capacidade da Sala', Status.BadRequest);
+  if (salaError) throw new AppError(`Algo deu errado ao verificar a capacidade da Sala, ${salaError}`, Status.InternalServerError); // 500
+  if (sala && sala.capacidade < qtdAlunos) throw new AppError('A Turma já alocada em uma Sala não pode ter sua quantidade de alunos maior que a capacidade da Sala', Status.BadRequest); // 400
   return;
 };

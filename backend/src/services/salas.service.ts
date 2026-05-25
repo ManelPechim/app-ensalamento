@@ -1,5 +1,5 @@
 import { supabase } from "../config/database/supabase.ts";
-import { SalaModel, SalaUpdate } from "../models/Sala.ts";
+import { SalaModel } from "../models/Sala.ts";
 import * as Repository from "../repositories/salas.repository.ts";
 import { AppError } from "../utils/app-error.ts";
 import { Status } from "../utils/http-status-code.ts";
